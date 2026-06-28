@@ -156,6 +156,47 @@ $('refreshBtn').onclick = async () => {
   await load();
 };
 
+$('clearDataBtn').onclick = () => {
+  $('clearModal').hidden = false;
+  $('confirmTextWrap').hidden = true;
+  $('confirmText').value = '';
+};
+
+$('confirmUnderstand').onclick = () => {
+  $('confirmTextWrap').hidden = false;
+  $('confirmText').focus();
+};
+
+$('cancelClearData').onclick = () => {
+  $('clearModal').hidden = true;
+};
+
+$('confirmClearData').onclick = async () => {
+  const res = await fetch('/api/admin/clear-data', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ confirm_step_1: true, confirm_text: $('confirmText').value }),
+  });
+  const data = await res.json();
+  $('clearModal').hidden = true;
+  $('banner').style.display = 'block';
+  $('banner').textContent = data.ok ? 'Dashboard data cleared. Refresh when ready.' : data.error || 'Clear failed.';
+  await load();
+};
+
+$('clearSessionsBtn').onclick = async () => {
+  const text = prompt('Type CLEAR LOGIN SESSIONS to delete saved portal sessions.');
+  if (text !== 'CLEAR LOGIN SESSIONS') return;
+  const res = await fetch('/api/admin/clear-sessions', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ confirm_text: text }),
+  });
+  const data = await res.json();
+  $('banner').style.display = 'block';
+  $('banner').textContent = data.ok ? 'Login sessions cleared.' : data.error || 'Clear sessions failed.';
+};
+
 for (const id of ['search', 'status', 'recommendation', 'minScore']) {
   $(id).addEventListener('input', renderRows);
 }

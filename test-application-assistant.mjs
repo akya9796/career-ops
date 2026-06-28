@@ -2,14 +2,15 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { resolve } from 'path';
 import { tmpdir } from 'os';
 import { parseMasterCv } from './src/cv/master-cv.mjs';
 import { scoreJob } from './src/scoring/scoring-engine.mjs';
 import { extractJobFacts } from './src/jobs/extract-job.mjs';
-import { discoverJobs } from './src/jobs/discover-jobs.mjs';
+import { authenticatedSourceBlocks, companyCareerUrls, discoverJobs } from './src/jobs/discover-jobs.mjs';
+import { credentialsForSource, loadLocalEnv } from './src/jobs/portal-auth.mjs';
 import { generateTailoredCv } from './src/cv/generate-tailored-cv.mjs';
 import { generateCoverLetter } from './src/cover_letters/generate-cover-letter.mjs';
 import { generateInterviewPrep } from './src/interview/generate-interview-prep.mjs';
@@ -18,7 +19,12 @@ import { generateBatch } from './src/applications/generate-batch.mjs';
 import { listApplyQueue } from './src/applications/apply-queue.mjs';
 import { applyAssist } from './src/applications/apply-assist.mjs';
 import { createDashboardServer } from './src/dashboard/server.mjs';
+import { clearDashboardData, clearLoginSessions } from './src/dashboard/admin-data.mjs';
 import { saveApplicationRecord } from './src/applications/application-records.mjs';
+import { parseAiConfig } from './src/ai/ai-config.mjs';
+import { AIManager } from './src/ai/ai-manager.mjs';
+import { loadPrompt } from './src/ai/prompt-loader.mjs';
+import { GeminiProvider } from './src/ai/providers/gemini.mjs';
 
 const temp = mkdtempSync(join(tmpdir(), 'application-assistant-'));
 
@@ -100,6 +106,108 @@ Company: ExampleCo
 Location: France
 
 We need API analysis, REST, JSON, XML, Jira, functional specifications, and stakeholder coordination.`);
+
+  const gitignoreText = readFileSync('.gitignore', 'utf-8');
+  assert.match(gitignoreText, /^\.env\.local$/m);
+  assert.match(gitignoreText, /^\.sessions\/$/m);
+  assert.match(readFileSync('.env.local.example', 'utf-8'), /JOBUP_USERNAME=\nJOBUP_PASSWORD=/);
+  assert.match(readFileSync('.env.local.example', 'utf-8'), /^GEMINI_API_KEY=$/m);
+  assert.equal(JSON.parse(readFileSync('package.json', 'utf-8')).scripts['login:portal'], 'node src/jobs/login-portal.mjs');
+  assert.equal(parseAiConfig(readFileSync('config/ai.yml', 'utf-8')).provider, 'gemini');
+  assert.equal(loadPrompt('cover-letter').text.includes('Use only facts from `cv.md`'), true);
+
+  const geminiCalls = [];
+  const gemini = new GeminiProvider({
+    config: { model: 'gemini-test', api_key_env: 'GEMINI_API_KEY' },
+    env: { GEMINI_API_KEY: 'test-key' },
+    fetchImpl: async (url, options) => {
+      geminiCalls.push({ url, options });
+      return new Response(JSON.stringify({ output_text: 'AI output' }), { status: 200, headers: { 'content-type': 'application/json' } });
+    },
+  });
+  const geminiResult = await gemini.generate({ systemPrompt: 'system', userPrompt: 'user', input: { ok: true } });
+  assert.equal(geminiResult.text, 'AI output');
+  assert.equal(geminiCalls[0].options.headers['x-goog-api-key'], 'test-key');
+  assert.equal(geminiCalls[0].options.body.includes('test-key'), false);
+  await assert.rejects(
+    () => new GeminiProvider({ config: { api_key_env: 'GEMINI_API_KEY' }, env: {}, fetchImpl: async () => null }).generate({}),
+    /GEMINI_API_KEY/
+  );
+
+  const selectedManager = new AIManager({
+    config: { provider: 'gemini', gemini: { enabled: true, model: 'gemini-test', api_key_env: 'GEMINI_API_KEY' } },
+    env: { GEMINI_API_KEY: 'test-key' },
+    fetchImpl: async () => new Response(JSON.stringify({ output_text: 'manager output' }), { status: 200, headers: { 'content-type': 'application/json' } }),
+  });
+  assert.equal(selectedManager.providerName, 'gemini');
+  assert.equal((await selectedManager.generate({ input: { task: 'test' } })).text, 'manager output');
+
+  let attempts = 0;
+  const fallbackManager = new AIManager({
+    config: { provider: 'gemini', gemini: { enabled: true } },
+    provider: {
+      generate: async () => {
+        attempts++;
+        throw new Error('temporary provider failure');
+      },
+    },
+  });
+  const fallbackResult = await fallbackManager.generate({ input: {}, fallback: 'safe fallback' });
+  assert.equal(attempts, 2);
+  assert.equal(fallbackResult.ok, false);
+  assert.equal(fallbackResult.text, 'safe fallback');
+
+  const securePortals = join(temp, 'secure-portals.yml');
+  writeFileSync(securePortals, `discovery:
+  search_queries:
+    - "Product Owner"
+  sources:
+    jobup:
+      enabled: true
+      search_url_template: "https://fixture.jobup.ch/fr/emplois/?term={query}"
+  authenticated_sources:
+    jobup:
+      enabled: true
+      login_required: true
+      login_url: "https://www.jobup.ch/fr/login/"
+      username_env: "JOBUP_USERNAME"
+      password_env: "JOBUP_PASSWORD"
+    linkedin:
+      enabled: false
+      login_required: true
+      mode: "manual_login_session"
+  company_career_urls:
+    - name: "Amadeus"
+      enabled: true
+      url: "https://careers.amadeus.com/"
+      login_required: false
+  manual_urls: []
+`);
+  const localEnv = {};
+  const envPath = join(temp, '.env.local');
+  writeFileSync(envPath, 'JOBUP_USERNAME=akash@example.com\nJOBUP_PASSWORD=super-secret-password\n');
+  loadLocalEnv({ envPath, target: localEnv });
+  const authSources = authenticatedSourceBlocks(securePortals);
+  assert.equal(authSources[0].username_env, 'JOBUP_USERNAME');
+  assert.equal(authSources[0].password_env, 'JOBUP_PASSWORD');
+  assert.equal(readFileSync(securePortals, 'utf-8').includes('super-secret-password'), false);
+  assert.deepEqual(credentialsForSource(authSources[0], { env: localEnv }), {
+    username: 'akash@example.com',
+    password: 'super-secret-password',
+    hasCredentials: true,
+    username_env: 'JOBUP_USERNAME',
+    password_env: 'JOBUP_PASSWORD',
+  });
+  const warned = [];
+  const originalWarn = console.warn;
+  console.warn = message => warned.push(String(message));
+  console.warn(`jobup: missing ${authSources[0].username_env} / ${authSources[0].password_env}`);
+  console.warn = originalWarn;
+  assert.equal(warned.join('\n').includes('super-secret-password'), false);
+  const companies = companyCareerUrls(securePortals);
+  assert.equal(companies.length, 1);
+  assert.equal(companies[0].name, 'Amadeus');
+  assert.equal(companies[0].login_required, false);
 
   const parsed = parseMasterCv(readFileSync(cvPath, 'utf-8'), cvPath);
   assert.equal(parsed.sections.some(section => section.type === 'skills'), true);
@@ -416,6 +524,46 @@ This role needs REST, JSON, XML, API analysis, Jira, and stakeholder coordinatio
   assert.match(multiPortalText, /WTTJCo/);
   process.env.APPLICATION_ASSISTANT_DISCOVERED_JOBS_DIR = join(automationRoot, 'jobs', 'discovered');
 
+  const companyRoot = join(temp, 'company-careers-fixture');
+  const companyPortals = join(companyRoot, 'portals.yml');
+  const companyDiscovered = join(companyRoot, 'discovered');
+  mkdirSync(companyRoot, { recursive: true });
+  writeFileSync(companyPortals, `discovery:
+  default_limit: 3
+  search_queries:
+    - "Product Owner"
+  sources:
+    jobup:
+      enabled: false
+      mode: "manual_url_import"
+  company_career_urls:
+    - name: "Amadeus"
+      enabled: true
+      url: "https://careers.example.test/"
+      login_required: false
+    - name: "Protected"
+      enabled: true
+      url: "https://protected.example.test/careers"
+      login_required: true
+  manual_urls: []
+`);
+  process.env.APPLICATION_ASSISTANT_DISCOVERED_JOBS_DIR = companyDiscovered;
+  const companyFetch = async fixtureUrl => {
+    const urlValue = String(fixtureUrl);
+    if (urlValue === 'https://careers.example.test/') {
+      return new Response('<a href="/jobs/api-product-owner">API Product Owner</a><a href="/about">About</a>', { status: 200, headers: { 'content-type': 'text/html' } });
+    }
+    if (urlValue.includes('/jobs/api-product-owner')) {
+      return new Response('Job Title: API Product Owner\nCompany: Amadeus\nLocation: Nice\n\nProduct owner API Jira', { status: 200, headers: { 'content-type': 'text/plain' } });
+    }
+    return new Response('not found', { status: 404 });
+  };
+  const companyDiscovery = await discoverJobs({ portalsPath: companyPortals, fetchImpl: companyFetch });
+  assert.equal(companyDiscovery.jobs_saved, 1);
+  assert.equal(companyDiscovery.source_messages.some(message => message.includes('Protected') && message.includes('login required')), true);
+  assert.match(readFileSync(companyDiscovery.outputs[0], 'utf-8'), /Amadeus/);
+  process.env.APPLICATION_ASSISTANT_DISCOVERED_JOBS_DIR = join(automationRoot, 'jobs', 'discovered');
+
   const batchScore = await scoreBatch({
     jobsDir: process.env.APPLICATION_ASSISTANT_DISCOVERED_JOBS_DIR,
     profilePath,
@@ -474,9 +622,27 @@ This role needs REST, JSON, XML, API analysis, Jira, and stakeholder coordinatio
   const dashboardRoot = join(temp, 'dashboard');
   const dashboardApps = join(dashboardRoot, 'applications');
   const dashboardGenerated = join(dashboardRoot, 'generated');
+  const dashboardDiscoveredForClear = join(dashboardRoot, 'jobs', 'discovered');
+  const dashboardReports = join(dashboardRoot, 'reports');
+  const dashboardSessions = join(dashboardRoot, 'sessions');
   process.env.APPLICATION_ASSISTANT_APPLICATIONS_DIR = dashboardApps;
   process.env.APPLICATION_ASSISTANT_GENERATED_DIR = dashboardGenerated;
+  process.env.APPLICATION_ASSISTANT_DISCOVERED_JOBS_DIR = dashboardDiscoveredForClear;
+  process.env.APPLICATION_ASSISTANT_REPORTS_DIR = dashboardReports;
+  process.env.APPLICATION_ASSISTANT_SESSIONS_DIR = dashboardSessions;
   mkdirSync(dashboardApps, { recursive: true });
+  mkdirSync(dashboardGenerated, { recursive: true });
+  mkdirSync(dashboardDiscoveredForClear, { recursive: true });
+  mkdirSync(dashboardReports, { recursive: true });
+  mkdirSync(dashboardSessions, { recursive: true });
+  mkdirSync(join(dashboardRoot, 'master'), { recursive: true });
+  mkdirSync(join(dashboardRoot, 'config'), { recursive: true });
+  writeFileSync(join(dashboardRoot, 'master', 'master-cv.pdf'), masterPdfBytes);
+  writeFileSync(join(dashboardRoot, 'config', 'portals.yml'), 'discovery:\n');
+  writeFileSync(join(dashboardDiscoveredForClear, 'job.json'), '{}');
+  writeFileSync(join(dashboardGenerated, 'package.txt'), 'generated');
+  writeFileSync(join(dashboardReports, 'report.md'), 'report');
+  writeFileSync(join(dashboardSessions, 'linkedin.json'), '{}');
   saveApplicationRecord(join(dashboardApps, 'sample.json'), {
     id: 'sampleco-business-analyst-geneva',
     unique_key: 'sampleco-business-analyst-geneva',
@@ -540,9 +706,42 @@ This role needs REST, JSON, XML, API analysis, Jira, and stakeholder coordinatio
     assert.equal(analyticsResponse.status, 200);
     assert.equal(analyticsJson.total_jobs, 1);
     assert.equal(analyticsJson.applied, 1);
+
+    const refusedClear = await fetch(`${started.url}/api/admin/clear-data`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ confirm_step_1: true, confirm_text: 'CLEAR' }),
+    });
+    assert.equal(refusedClear.status, 400);
+    assert.equal(existsSync(join(dashboardApps, 'sample.json')), true);
+
+    const clearResponse = await fetch(`${started.url}/api/admin/clear-data`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ confirm_step_1: true, confirm_text: 'CLEAR DASHBOARD DATA' }),
+    });
+    const clearJson = await clearResponse.json();
+    assert.equal(clearResponse.status, 200);
+    assert.equal(clearJson.ok, true);
+    assert.equal(existsSync(join(dashboardApps, 'sample.json')), false);
+    assert.equal(existsSync(join(dashboardGenerated, 'package.txt')), false);
+    assert.equal(existsSync(join(dashboardDiscoveredForClear, 'job.json')), false);
+    assert.equal(existsSync(join(dashboardReports, 'report.md')), false);
+    assert.equal(existsSync(join(dashboardSessions, 'linkedin.json')), true);
+    assert.equal(existsSync(join(dashboardRoot, 'master', 'master-cv.pdf')), true);
+    assert.equal(existsSync(join(dashboardRoot, 'config', 'portals.yml')), true);
   } finally {
     started.close();
   }
+
+  writeFileSync(join(dashboardSessions, 'linkedin.json'), '{}');
+  const refusedSessions = clearLoginSessions({ confirm_text: 'CLEAR' });
+  assert.equal(refusedSessions.ok, false);
+  assert.equal(existsSync(join(dashboardSessions, 'linkedin.json')), true);
+  const clearedSessions = clearLoginSessions({ confirm_text: 'CLEAR LOGIN SESSIONS' });
+  assert.equal(clearedSessions.ok, true);
+  assert.equal(existsSync(join(dashboardSessions, 'linkedin.json')), false);
+  assert.equal(existsSync(dashboardSessions), true);
 
   const dashboardRefreshRoot = join(temp, 'dashboard-refresh');
   const dashboardPortals = join(dashboardRefreshRoot, 'portals.yml');

@@ -1,0 +1,22 @@
+provider: gemini
+
+gemini:
+  enabled: true
+  model: gemini-2.5-flash
+  api_key_env: GEMINI_API_KEY
+
+openai:
+  enabled: false
+
+claude:
+  enabled: false
+
+ollama:
+  enabled: false
+  endpoint: http://localhost:11434
+
+openrouter:
+  enabled: false
+
+azure_openai:
+  enabled: false

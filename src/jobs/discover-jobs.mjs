@@ -2,6 +2,8 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'path';
 import { pathToFileURL } from 'url';
 import { extractJobFacts, extractJobFromUrl } from './extract-job.mjs';
+import { fetchWithTimeout } from './http.mjs';
+import { credentialsForSource, loadLocalEnv, sessionPathForSource, withAuthenticatedPage } from './portal-auth.mjs';
 
 function slugify(value) {
   return String(value || 'job').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80) || 'job';
@@ -40,8 +42,7 @@ function extractTargetRoles(profilePath = 'config/profile.yml') {
 function extractManualUrls(portalsPath = 'config/portals.yml') {
   const raw = readText(portalsPath);
   const urls = simpleYamlList(raw, 'manual_urls');
-  const extra = [...raw.matchAll(/^\s*url:\s*["']?(.+?)["']?\s*$/gm)].map(match => match[1]);
-  return [...new Set([...urls, ...extra])].filter(Boolean);
+  return [...new Set(urls)].filter(Boolean);
 }
 
 function extractSearchQueries(portalsPath = 'config/portals.yml') {
@@ -59,10 +60,21 @@ function jobupSearchTemplate(portalsPath = 'config/portals.yml') {
   return match?.[1] || 'https://www.jobup.ch/fr/emplois/?term={query}';
 }
 
-function sourceBlocks(portalsPath = 'config/portals.yml') {
+function mappingBlocks(portalsPath = 'config/portals.yml', key = 'sources') {
   const raw = readText(portalsPath);
   const lines = raw.split(/\r?\n/);
-  const sourcesIndex = lines.findIndex(line => line.trim() === 'sources:');
+  const candidates = lines
+    .map((line, index) => line.trim() === `${key}:` ? index : -1)
+    .filter(index => index !== -1);
+  const sourcesIndex = candidates.find(index => {
+    const sourcesIndent = lines[index].match(/^\s*/)?.[0]?.length || 0;
+    return lines.slice(index + 1).some(line => {
+      if (!line.trim()) return false;
+      const indent = line.match(/^\s*/)?.[0]?.length || 0;
+      if (indent <= sourcesIndent) return false;
+      return new RegExp(`^\\s{${sourcesIndent + 2}}[a-zA-Z0-9_]+:\\s*$`).test(line);
+    });
+  }) ?? -1;
   if (sourcesIndex === -1) return [];
   const sourcesIndent = lines[sourcesIndex].match(/^\s*/)?.[0]?.length || 0;
   const blocks = [];
@@ -86,13 +98,62 @@ function sourceBlocks(portalsPath = 'config/portals.yml') {
     return {
       id: block.id,
       enabled: value('enabled') !== 'false',
+      login_required: value('login_required') === 'true',
       mode: value('mode'),
       template: value('search_url_template'),
+      login_url: value('login_url'),
+      username_env: value('username_env'),
+      password_env: value('password_env'),
+      username_selector: value('username_selector'),
+      password_selector: value('password_selector'),
+      submit_selector: value('submit_selector'),
       reason: value('reason'),
+      note: value('note'),
       region: value('region'),
       reliability: value('reliability') || 'best_effort',
     };
   });
+}
+
+function sourceBlocks(portalsPath = 'config/portals.yml') {
+  return mappingBlocks(portalsPath, 'sources');
+}
+
+export function authenticatedSourceBlocks(portalsPath = 'config/portals.yml') {
+  return mappingBlocks(portalsPath, 'authenticated_sources');
+}
+
+export function companyCareerUrls(portalsPath = 'config/portals.yml') {
+  const raw = readText(portalsPath);
+  const lines = raw.split(/\r?\n/);
+  const start = lines.findIndex(line => line.trim() === 'company_career_urls:');
+  if (start === -1) return [];
+  const baseIndent = lines[start].match(/^\s*/)?.[0]?.length || 0;
+  const entries = [];
+  let current = null;
+  const assign = (entry, line) => {
+    const match = line.match(/^\s*([a-zA-Z0-9_]+):\s*["']?(.+?)["']?\s*$/);
+    if (match) entry[match[1]] = match[2].trim();
+  };
+  for (const line of lines.slice(start + 1)) {
+    if (!line.trim()) continue;
+    const indent = line.match(/^\s*/)?.[0]?.length || 0;
+    if (indent <= baseIndent) break;
+    const item = line.match(/^\s*-\s+name:\s*["']?(.+?)["']?\s*$/);
+    if (item) {
+      if (current) entries.push(current);
+      current = { name: item[1].trim() };
+      continue;
+    }
+    if (current) assign(current, line);
+  }
+  if (current) entries.push(current);
+  return entries.map(entry => ({
+    ...entry,
+    id: slugify(entry.name),
+    enabled: entry.enabled !== 'false',
+    login_required: entry.login_required === 'true',
+  }));
 }
 
 function outputPathForFacts(facts, fallback) {
@@ -147,6 +208,7 @@ function isLikelyDetailUrl(sourceId, url) {
     if (sourceId === 'jobs_ch') return host.endsWith('jobs.ch') && /\/offres-emplois\/.+/.test(path);
     if (sourceId === 'welcome_to_the_jungle') return host.endsWith('welcometothejungle.com') && /\/companies\/.+\/jobs\/.+/.test(path);
     if (sourceId === 'hellowork') return host.endsWith('hellowork.com') && /\/fr-fr\/emplois\/.+\.html$/.test(path);
+    if (sourceId === 'company_careers') return /job|career|emploi|poste|opening|position|requisition|req/i.test(path);
     return false;
   } catch {
     return false;
@@ -182,6 +244,67 @@ async function discoverSourceUrls({ source, queries, limit, fetchImpl = fetch })
   return { urls, searchResultUrlsFound };
 }
 
+async function discoverAuthenticatedSourceUrls({ source, queries, limit }) {
+  if (source.mode === 'manual_login_session') {
+    return { urls: [], searchResultUrlsFound: 0, message: `${source.id}: manual login session mode; run npm run login:portal -- --source ${source.id}.` };
+  }
+  if (!source.template) {
+    return { urls: [], searchResultUrlsFound: 0, message: `${source.id}: authenticated search template not configured.` };
+  }
+  const creds = credentialsForSource(source);
+  if (!creds.hasCredentials && !existsSync(sessionPathForSource(source.id))) {
+    return { urls: [], searchResultUrlsFound: 0, message: `${source.id}: missing ${creds.username_env || 'username env'} / ${creds.password_env || 'password env'} or saved session; manual import recommended.` };
+  }
+  try {
+    return await withAuthenticatedPage(source, async page => {
+      const urls = [];
+      let searchResultUrlsFound = 0;
+      for (const query of queries) {
+        const searchUrl = source.template.replace('{query}', encodeURIComponent(query));
+        await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
+        const links = await page.$$eval('a[href]', anchors => anchors.map(anchor => ({ title: anchor.textContent || '', url: anchor.href })));
+        const detailLinks = links.filter(link => isLikelyDetailUrl(source.id, link.url));
+        searchResultUrlsFound += detailLinks.length;
+        urls.push(...detailLinks.slice(0, limit).map(link => link.url));
+        await page.waitForTimeout(600);
+      }
+      return { urls, searchResultUrlsFound };
+    }, { headless: true });
+  } catch (err) {
+    return { urls: [], searchResultUrlsFound: 0, message: `${source.id}: authenticated discovery failed (${err.message}).` };
+  }
+}
+
+async function discoverCompanyCareerUrls({ companies, queries, limit, fetchImpl = fetch }) {
+  const urls = [];
+  let searchResultUrlsFound = 0;
+  const messages = [];
+  for (const company of companies) {
+    if (!company.enabled) continue;
+    if (!company.url) {
+      messages.push(`${company.name}: company career URL missing; manual import recommended.`);
+      continue;
+    }
+    if (company.login_required) {
+      messages.push(`${company.name}: login required; run manual session or import URLs manually.`);
+      continue;
+    }
+    try {
+      const html = await fetchText(company.url, fetchImpl);
+      const queryPattern = queries.length ? new RegExp(queries.map(q => q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i') : /job|career|analyst|product/i;
+      const links = htmlLinks(html, company.url)
+        .filter(link => queryPattern.test(`${link.title} ${link.url}`))
+        .filter(link => isLikelyDetailUrl('company_careers', link.url));
+      searchResultUrlsFound += links.length;
+      urls.push(...links.slice(0, limit).map(link => link.url));
+      if (!links.length) messages.push(`${company.name}: no matching job links found; manual import recommended if the site is dynamic.`);
+    } catch (err) {
+      messages.push(`${company.name}: company careers discovery failed (${err.message}); manual import recommended.`);
+    }
+  }
+  return { urls, searchResultUrlsFound, messages };
+}
+
 export async function discoverJobs({
   profilePath = 'config/profile.yml',
   portalsPath = 'config/portals.yml',
@@ -189,13 +312,15 @@ export async function discoverJobs({
   input = '',
   live = true,
   limit = null,
-  fetchImpl = fetch,
+  fetchImpl = fetchWithTimeout,
 } = {}) {
   const outputs = [];
   const effectiveLimit = limit ?? discoveryDefaultLimit(portalsPath);
   const roles = extractTargetRoles(profilePath);
   const queries = extractSearchQueries(portalsPath);
   const sources = sourceBlocks(portalsPath);
+  const authenticatedSources = authenticatedSourceBlocks(portalsPath);
+  const companies = companyCareerUrls(portalsPath);
   const stats = {
     queries_scanned: live ? queries.length : 0,
     sources_scanned: 0,
@@ -205,6 +330,7 @@ export async function discoverJobs({
     jobs_saved: 0,
     source_messages: [],
   };
+  loadLocalEnv();
   const urls = [...extractManualUrls(portalsPath)];
   if (url) urls.push(url);
   if (input && existsSync(input)) {
@@ -226,6 +352,20 @@ export async function discoverJobs({
       stats.sources_scanned++;
       const found = await discoverSourceUrls({ source, queries, limit: effectiveLimit, fetchImpl });
       stats.search_result_urls_found += found.searchResultUrlsFound;
+      urls.push(...found.urls);
+    }
+    for (const source of authenticatedSources.filter(item => item.enabled && item.login_required)) {
+      stats.sources_scanned++;
+      const found = await discoverAuthenticatedSourceUrls({ source: { ...sources.find(item => item.id === source.id), ...source }, queries, limit: effectiveLimit });
+      stats.search_result_urls_found += found.searchResultUrlsFound;
+      urls.push(...found.urls);
+      if (found.message) stats.source_messages.push(found.message);
+    }
+    if (companies.length) {
+      const found = await discoverCompanyCareerUrls({ companies, queries, limit: effectiveLimit, fetchImpl });
+      stats.sources_scanned += companies.filter(company => company.enabled).length;
+      stats.search_result_urls_found += found.searchResultUrlsFound;
+      stats.source_messages.push(...found.messages);
       urls.push(...found.urls);
     }
   }

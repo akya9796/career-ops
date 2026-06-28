@@ -14,6 +14,7 @@
     "generate:cover-letter": "node src/cover_letters/generate-cover-letter.mjs",
     "interview:prep": "node src/interview/generate-interview-prep.mjs",
     "discover:jobs": "node src/jobs/discover-jobs.mjs",
+    "login:portal": "node src/jobs/login-portal.mjs",
     "score:batch": "node src/scoring/score-batch.mjs",
     "generate:batch": "node src/applications/generate-batch.mjs",
     "apply:queue": "node src/applications/apply-queue.mjs",

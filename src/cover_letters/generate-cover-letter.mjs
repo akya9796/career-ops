@@ -4,6 +4,8 @@ import { pathToFileURL } from 'url';
 import { parseMasterCv } from '../cv/master-cv.mjs';
 import { requireLatestJob } from '../jobs/latest-job.mjs';
 import { readAppConfig } from '../config/app-config.mjs';
+import { AIManager } from '../ai/ai-manager.mjs';
+import { loadPrompt } from '../ai/prompt-loader.mjs';
 
 const GENERIC_JOB_VALUES = new Set(['', 'position', 'job', 'jobs', 'role', 'the role', 'your company', 'company']);
 
@@ -134,6 +136,36 @@ export function generateCoverLetter({ cvPath = 'cv.md', jobPath, output = 'data/
   return { output, audit, selected_facts: relevant.length };
 }
 
+export async function generateCoverLetterWithAI({
+  cvPath = 'cv.md',
+  jobPath,
+  output = 'data/generated/cover-letter.md',
+  profilePath = 'config/profile.yml',
+  aiManager = null,
+} = {}) {
+  const fallback = generateCoverLetter({ cvPath, jobPath, output, profilePath });
+  const cvText = readFileSync(cvPath, 'utf-8');
+  const job = readJob(jobPath);
+  const prompt = loadPrompt('cover-letter');
+  const manager = aiManager || new AIManager();
+  const result = await manager.generate({
+    systemPrompt: prompt.text,
+    userPrompt: 'Generate the final cover letter only. Do not include audit notes, markdown headings, or unsupported claims.',
+    input: {
+      cv: cvText,
+      job,
+      profile: readAppConfig({ profilePath }).candidate,
+    },
+    fallback: readFileSync(output, 'utf-8'),
+    maxOutputTokens: 1800,
+  });
+  if (result.ok && result.text.trim()) {
+    writeFileSync(output, result.text.trim() + '\n');
+    return { ...fallback, ai: { provider: result.provider, model: result.model, used: true } };
+  }
+  return { ...fallback, ai: { provider: result.provider, used: false, error: result.error } };
+}
+
 function defaultPdfPath(markdownPath) {
   return markdownPath.replace(/\.[^.\\/]+$/, '') + '.pdf';
 }
@@ -157,7 +189,9 @@ async function main() {
   }
   try {
     if (!jobPath && latest) jobPath = requireLatestJob().jobPath;
-    const result = generateCoverLetter({ cvPath, jobPath, output });
+    const result = args.includes('--ai')
+      ? await generateCoverLetterWithAI({ cvPath, jobPath, output })
+      : generateCoverLetter({ cvPath, jobPath, output });
     result.job_file = jobPath;
     if (pdf) {
       const { renderMarkdownFileToPdf } = await import('../pdf/render-markdown-pdf.mjs');

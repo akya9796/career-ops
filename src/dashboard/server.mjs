@@ -6,6 +6,7 @@ import { spawn } from 'child_process';
 import { listApplicationRecords, normalizeApplicationRecord, saveApplicationRecord } from '../applications/application-records.mjs';
 import { runRefresh, refreshState } from '../applications/refresh-pipeline.mjs';
 import { readAppConfig } from '../config/app-config.mjs';
+import { clearDashboardData, clearLoginSessions } from './admin-data.mjs';
 
 const ROOT = resolve('.');
 const SAFE_DIRS = ['data/generated', 'generated', 'data/jobs', 'data/applications', 'master'].map(dir => resolve(dir));
@@ -166,6 +167,26 @@ const DASHBOARD_HTML = `<!doctype html>
       <div class="insight-card"><span>Status Flow</span><div id="statusBars" class="bar-stack"></div></div>
       <div class="insight-card"><span>Top Role Signals</span><div id="roleSignals" class="chips"></div></div>
     </section>
+
+    <section class="admin-band">
+      <button class="danger" id="clearDataBtn">Clear Dashboard Data</button>
+      <button class="ghost" id="clearSessionsBtn">Clear Login Sessions</button>
+    </section>
+  </div>
+  <div class="modal-backdrop" id="clearModal" hidden>
+    <div class="modal">
+      <div class="modal-title">Clear Dashboard Data</div>
+      <p>This will delete discovered jobs, application records, generated documents, and dashboard state. Your master CV and config files will NOT be deleted.</p>
+      <button id="confirmUnderstand">I understand</button>
+      <div id="confirmTextWrap" class="confirm-text" hidden>
+        <label for="confirmText">Type CLEAR DASHBOARD DATA</label>
+        <input id="confirmText" autocomplete="off">
+        <div class="modal-actions">
+          <button class="ghost" id="cancelClearData">Cancel</button>
+          <button class="danger" id="confirmClearData">Clear Dashboard Data</button>
+        </div>
+      </div>
+    </div>
   </div>
 <script src="/assets/dashboard.js"></script>
 </body>
@@ -220,6 +241,14 @@ export function createDashboardServer({ noDiscover = false, open = true, port = 
         return json(res, 200, { deleted: true });
       }
       if (req.method === 'POST' && url.pathname === '/api/refresh') return json(res, 200, await runRefresh(refreshOptions));
+      if (req.method === 'POST' && url.pathname === '/api/admin/clear-data') {
+        const result = clearDashboardData(await parseBody(req));
+        return json(res, result.status, result);
+      }
+      if (req.method === 'POST' && url.pathname === '/api/admin/clear-sessions') {
+        const result = clearLoginSessions(await parseBody(req));
+        return json(res, result.status, result);
+      }
       if (req.method === 'GET' && url.pathname.startsWith('/files/')) {
         const file = safeFile(url.pathname);
         if (!file) return json(res, 404, { error: 'file not found' });

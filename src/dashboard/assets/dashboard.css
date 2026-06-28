@@ -73,6 +73,11 @@ button.ghost {
   box-shadow: inset 0 1px 0 var(--shine);
 }
 
+button.danger {
+  background: linear-gradient(135deg, var(--danger), #b93f55);
+  box-shadow: 0 14px 30px rgba(239, 95, 120, .2), inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+
 input, select {
   width: 100%;
   min-width: 0;
@@ -410,6 +415,67 @@ col.updated { width: 104px; }
   display: grid;
   grid-template-columns: 1fr 1fr 1.2fr;
   gap: 10px;
+}
+
+.admin-band {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 4px 0;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(16, 23, 34, .42);
+  backdrop-filter: blur(10px);
+}
+
+.modal-backdrop[hidden] { display: none; }
+
+.modal {
+  width: min(520px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: 0 24px 80px var(--shadow), inset 0 1px 0 var(--shine);
+}
+
+.modal-title {
+  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.modal p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.confirm-text {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.confirm-text label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 .insight-card {

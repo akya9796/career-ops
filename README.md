@@ -2,12 +2,14 @@
 
 A local futuristic cockpit for job discovery, fit scoring, document generation, and application tracking.
 
-This is not a career intelligence platform and not an auto-apply bot. It does not store credentials, bypass CAPTCHA, log into portals, or submit applications for you.
+This is not a career intelligence platform and not an auto-apply bot. It does not store credentials in tracked config, bypass CAPTCHA, or submit applications for you.
 
 ## What You Get
 
 - Soft glass dashboard at `http://localhost:3000`
 - Job discovery from configured sources
+- Secure authenticated portal session support
+- Direct company career URL discovery
 - Manual URL import
 - Batch scoring
 - Preserved master CV PDF copy
@@ -30,6 +32,8 @@ These files are personal and ignored by git:
 - `data/generated/*`
 - `data/cv_versions/*`
 - `config/profile.yml`
+- `.env.local`
+- `.sessions/*`
 
 Keep your real CV at:
 
@@ -63,7 +67,49 @@ Configure:
 config/profile.yml
 config/portals.yml
 config/scoring.yml
+config/ai.yml
 ```
+
+For authenticated portals, create a local secret file from the placeholder template:
+
+```bash
+cp .env.local.example .env.local
+```
+
+Put real usernames and passwords only in `.env.local` or your OS/environment secret store. Never put credentials in `config/portals.yml` and never commit `.env.local`.
+
+## AI Provider
+
+The app has a provider-agnostic AI layer under `src/ai/`. Business logic calls `AIManager.generate(...)`; it does not call Gemini or any provider directly.
+
+V1 supports Gemini. Planned provider slots exist for OpenAI, Claude, Ollama, OpenRouter, and Azure OpenAI, but they are intentionally not implemented yet.
+
+Get a Gemini API key from Google AI Studio:
+
+```text
+https://aistudio.google.com/apikey
+```
+
+Then add it to `.env.local`:
+
+```text
+GEMINI_API_KEY=your_key_here
+```
+
+Select the provider and model in `config/ai.yml`:
+
+```yaml
+provider: gemini
+
+gemini:
+  enabled: true
+  model: gemini-2.5-flash
+  api_key_env: GEMINI_API_KEY
+```
+
+Switching providers later should only require changing `provider:` and that provider's config block. Current AI usage is limited to cover letter generation, job summary, and job fit explanation. Scraping, duplicate detection, scheduling, dashboard state, storage, application tracking, and scoring remain deterministic.
+
+If Gemini is missing or fails, the app retries once, writes deterministic fallback content where needed, and keeps the dashboard usable.
 
 ## Start The App
 
@@ -152,6 +198,47 @@ discovery:
   manual_urls: []
 ```
 
+Authenticated sources reference credential key names, not credential values:
+
+```yaml
+discovery:
+  authenticated_sources:
+    jobup:
+      enabled: true
+      login_required: true
+      login_url: "https://www.jobup.ch/fr/login/"
+      username_env: "JOBUP_USERNAME"
+      password_env: "JOBUP_PASSWORD"
+    linkedin:
+      enabled: false
+      login_required: true
+      mode: "manual_login_session"
+      note: "Do not automate CAPTCHA or bypass protections."
+```
+
+If a source needs login and safe selectors are not configured, the app opens a browser for manual login and saves local session state under `.sessions/`. Passwords are not printed in logs.
+
+For protected portals such as LinkedIn, use manual session mode:
+
+```bash
+npm run login:portal -- --source linkedin
+```
+
+The command opens a browser, lets you log in manually, and stores only browser session state under `.sessions/`. It does not store a password for manual-login portals.
+
+Direct company career pages are configured under `discovery.company_career_urls`:
+
+```yaml
+discovery:
+  company_career_urls:
+    - name: "Amadeus"
+      enabled: true
+      url: "https://careers.amadeus.com/"
+      login_required: false
+```
+
+Discovery scans enabled portal search pages, enabled company career URLs, saved authenticated sessions where configured, and any manual URLs. If a company page is dynamic or protected, the app logs `manual import recommended` and continues.
+
 Discovery output tracks:
 
 - `queries_scanned`
@@ -186,6 +273,8 @@ Local routes:
 - `DELETE /api/applications/:id`
 - `POST /api/refresh`
 - `GET /api/analytics`
+- `POST /api/admin/clear-data`
+- `POST /api/admin/clear-sessions`
 
 Generated files are served only from safe local project data directories.
 
@@ -196,19 +285,21 @@ The dashboard is the normal workflow, but these commands remain available:
 ```bash
 npm run doctor
 npm run discover:jobs
+npm run login:portal -- --source linkedin
 npm run score:batch
 npm run generate:batch
 npm run apply:queue
 npm run apply:assist -- --latest
 npm run score:job -- --url https://company.example/jobs/123
 npm run generate:cover-letter -- --latest --pdf
+npm run generate:cover-letter -- --latest --ai --pdf
 npm run test:application-assistant
 ```
 
 ## Limitations
 
 - Some portals block scraping or require login.
-- LinkedIn usually requires manual URL import.
+- LinkedIn usually requires manual login session mode or manual URL import.
 - The app never auto-submits applications.
 - The app never stores job portal credentials.
 - The app does not bypass CAPTCHA or portal protections.
@@ -224,12 +315,25 @@ git status --short
 
 Your personal CV, generated documents, discovered jobs, application records, and local profile config should stay ignored.
 
-To intentionally reset local generated data, remove the contents of these ignored folders while keeping `.gitkeep` files:
+To reset from the dashboard, use `Clear Dashboard Data`. It requires two confirmations: click `I understand`, then type exactly:
+
+```text
+CLEAR DASHBOARD DATA
+```
+
+This clears:
 
 ```text
 data/applications/
-data/jobs/
+data/jobs/discovered/
 data/generated/
-data/cv_versions/
-generated/
+data/reports/
 ```
+
+It does not delete `master/master-cv.pdf`, `cv.md`, `config/`, `prompts/`, `.env.local`, `.sessions/`, or `archive/`.
+
+Use `Clear Login Sessions` separately to remove only `.sessions/`.
+
+The legacy reuse audit is in `docs/LEGACY_REUSE_AUDIT.md`. The only legacy code reused now is a small HTTP timeout/user-agent helper for discovery reliability.
+
+The AI provider audit is in `docs/AI_PROVIDER_AUDIT.md`.
