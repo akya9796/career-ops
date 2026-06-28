@@ -1,9 +1,21 @@
 # Personal data (user fills these)
 cv.md
+master/*
+!master/.gitkeep
+generated/*
+!generated/.gitkeep
 data/applications.md
 data/applications.db
 data/pipeline.md
 data/scan-history.tsv
+data/applications/*
+!data/applications/.gitkeep
+data/jobs/*
+!data/jobs/.gitkeep
+data/generated/*
+!data/generated/.gitkeep
+data/cv_versions/*
+!data/cv_versions/.gitkeep
 data/parser-output/**/*.json
 !data/parser-output/.gitkeep
 !data/parser-output/**/.gitkeep

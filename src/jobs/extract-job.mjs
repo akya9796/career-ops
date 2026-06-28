@@ -9,9 +9,70 @@ function slugify(value) {
 function firstMatch(text, patterns) {
   for (const pattern of patterns) {
     const match = text.match(pattern);
-    if (match?.[1]) return match[1].trim();
+    if (match?.[1]) return match[match.length - 1].trim();
   }
   return '';
+}
+
+function decodeHtmlEntities(value) {
+  return String(value || '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&#x27;/g, "'");
+}
+
+const GENERIC_COMPANY_VALUES = new Set([
+  'position',
+  'job',
+  'jobs',
+  'role',
+  'opportunity',
+  'company',
+  'employer',
+  'hiring team',
+  'recruiter',
+  'department',
+  'type de contrat',
+  'taux d\'activité',
+  'domaine d\'activité',
+  'tous les filtres',
+]);
+
+function cleanSingleLine(value) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .replace(/[|•].*$/, '')
+    .trim()
+    .replace(/^[\s:,-]+|[\s:,-]+$/g, '');
+}
+
+function cleanCompany(value) {
+  const cleaned = cleanSingleLine(value);
+  if (!cleaned) return '';
+  if (GENERIC_COMPANY_VALUES.has(cleaned.toLowerCase())) return '';
+  if (cleaned.length > 80) return '';
+  if (/^(location|office|search|filter|position|contract|salary|apply|login)\b/i.test(cleaned)) return '';
+  return cleaned;
+}
+
+function cleanLocation(value) {
+  const cleaned = cleanSingleLine(value);
+  if (!cleaned) return '';
+  if (cleaned.length > 120) return '';
+  if (/^(location|office|search|filter|job|jobs|apply|save|type de contrat|taux d'activit)/i.test(cleaned)) return '';
+  return cleaned;
+}
+
+function cleanTitle(value) {
+  const cleaned = cleanSingleLine(value);
+  if (!cleaned) return '';
+  if (/^(position|job|jobs|search|filter|all filters)$/i.test(cleaned)) return '';
+  if (cleaned.length > 120) return '';
+  return cleaned;
 }
 
 function htmlToText(value) {
@@ -26,10 +87,117 @@ function htmlToText(value) {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&#x27;/g, "'")
     .replace(/[ \t]{2,}/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+}
+
+function objectValues(value) {
+  if (!value || typeof value !== 'object') return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function extractJsonLdHints(html) {
+  const hints = {};
+  const scripts = String(html || '').match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi) || [];
+  for (const script of scripts) {
+    const jsonText = script.replace(/^<script[^>]*>/i, '').replace(/<\/script>$/i, '').trim();
+    try {
+      const parsed = JSON.parse(decodeHtmlEntities(jsonText));
+      const nodes = objectValues(parsed['@graph'] || parsed);
+      for (const node of nodes.flatMap(objectValues)) {
+        const type = String(node?.['@type'] || '').toLowerCase();
+        if (!type.includes('jobposting')) continue;
+        hints.title ||= cleanTitle(node.title);
+        hints.company ||= cleanCompany(node.hiringOrganization?.name || node.organization?.name);
+        const locations = objectValues(node.jobLocation);
+        const address = locations[0]?.address || {};
+        hints.location ||= cleanLocation([
+          address.addressLocality,
+          address.addressRegion,
+          address.addressCountry,
+        ].filter(Boolean).join(', '));
+      }
+    } catch {
+      // Some sites include non-standard JSON-LD. Other extraction paths still apply.
+    }
+  }
+  return hints;
+}
+
+function extractHtmlHints(html) {
+  const raw = decodeHtmlEntities(html);
+  const title = firstMatch(raw, [
+    /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i,
+    /<title[^>]*>([\s\S]*?)<\/title>/i,
+  ]);
+  const cleanedTitle = cleanTitle(title.replace(/\s+-\s+(?:Offre d'emploi chez|Annonce sur).+$/i, ''));
+  const company = firstMatch(title, [
+    /\s+-\s+Offre d'emploi chez\s+(.+?)\s+-\s+jobup\.ch/i,
+    /\s+-\s+Job offer at\s+(.+?)\s+-\s+jobup\.ch/i,
+  ]);
+  return {
+    ...extractJsonLdHints(raw),
+    title: cleanedTitle || extractJsonLdHints(raw).title || '',
+    company: cleanCompany(company) || extractJsonLdHints(raw).company || '',
+  };
+}
+
+const LOCATION_WORD_PATTERN = /(Gen.{0,4}ve|Geneva|Lausanne|Z.{0,4}rich|Zurich|Basel|Bern|Paris|Lyon|Annecy|Remote|France|Switzerland)/i;
+
+export function inferJobMetadataFromText(text, hints = {}) {
+  const normalized = String(text || '').replace(/\r\n/g, '\n').trim();
+  const titleFromHeader = firstMatch(normalized, [
+    /^#\s+(.+)$/m,
+    /^Position Title:\s*(.+)$/im,
+    /^Role:\s*(.+)$/im,
+    /^Job Title:\s*(.+)$/im,
+    /^Title:\s*(.+)$/im,
+    /^(.+?)\s+-\s+(?:Offre d'emploi chez|Annonce sur|Job offer at)\s+.+?\s+-\s+jobup\.ch\s*$/im,
+    /\bApplication for\s+(.+?)\s+(?:at|@)\s+[A-Z][A-Za-z0-9 .&-]{2,}/i,
+  ]);
+  const title = cleanTitle(hints.title || titleFromHeader);
+
+  const companyFromHeader = firstMatch(normalized, [
+    /^Company:\s*(.+)$/im,
+    /^Employer:\s*(.+)$/im,
+    /^Organization:\s*(.+)$/im,
+    /^.+?\s+-\s+Offre d'emploi chez\s+(.+?)\s+-\s+jobup\.ch\s*$/im,
+    /^.+?\s+-\s+Job offer at\s+(.+?)\s+-\s+jobup\.ch\s*$/im,
+  ]);
+  let company = cleanCompany(hints.company || companyFromHeader);
+
+  let location = cleanLocation(hints.location || firstMatch(normalized, [
+    /^Location:\s*(.+)$/im,
+    /^Lieu\s*:\s*(.+)$/im,
+    /\b(?:Location|Office|Lieu de travail)\s*[:|-]\s*(.+)$/im,
+  ]));
+
+  if (title) {
+    const lines = normalized.split('\n').map(line => cleanSingleLine(line)).filter(Boolean);
+    const titleIndex = lines.findIndex(line => line.toLowerCase() === title.toLowerCase());
+    if (titleIndex > 0) {
+      for (let index = Math.max(0, titleIndex - 5); index < titleIndex; index++) {
+        const line = lines[index];
+        if (!company && /^[A-Z0-9][A-Za-z0-9 .&'()+/-]{2,80}$/.test(line) && !/^(save|apply|postuler|sauvegarder|recherche)$/i.test(line)) {
+          const companyLocation = line.match(/^(.+?)\s+((?:Gen.{0,4}ve|Geneva|Lausanne|Z.{0,4}rich|Zurich|Basel|Bern|Paris|Lyon|Annecy|Remote|France|Switzerland).*)$/i);
+          if (companyLocation) {
+            company = cleanCompany(companyLocation[1]);
+            location ||= cleanLocation(companyLocation[2]);
+          } else {
+            company = cleanCompany(line);
+          }
+        }
+        if (!location && LOCATION_WORD_PATTERN.test(line)) {
+          location = cleanLocation(line);
+        }
+      }
+    }
+  }
+
+  return { title: title || '', company: company || '', location: location || '' };
 }
 
 function outputPathForFacts(facts, fallback = 'job') {
@@ -37,23 +205,9 @@ function outputPathForFacts(facts, fallback = 'job') {
   return `${dir}/${slugify(facts.company || fallback)}-${slugify(facts.title || 'job')}.json`;
 }
 
-export function extractJobFacts(text, source = '') {
+export function extractJobFacts(text, source = '', hints = {}) {
   const normalized = String(text || '').replace(/\r\n/g, '\n').trim();
-  const title = firstMatch(normalized, [
-    /^#\s+(.+)$/m,
-    /^Role:\s*(.+)$/im,
-    /^Job Title:\s*(.+)$/im,
-    /^Title:\s*(.+)$/im,
-  ]);
-  const company = firstMatch(normalized, [
-    /^Company:\s*(.+)$/im,
-    /^Employer:\s*(.+)$/im,
-    /(?:at|@)\s+([A-Z][A-Za-z0-9 .&-]{2,})/,
-  ]);
-  const location = firstMatch(normalized, [
-    /^Location:\s*(.+)$/im,
-    /\b(Location|Office)\s*[:|-]\s*(.+)$/im,
-  ]);
+  const metadata = inferJobMetadataFromText(normalized, hints);
   const lower = normalized.toLowerCase();
   const skills = [
     'api', 'rest', 'soap', 'json', 'xml', 'etl', 'vba', 'sql', 'python',
@@ -64,9 +218,9 @@ export function extractJobFacts(text, source = '') {
     schema_version: 1,
     source,
     extracted_at: new Date().toISOString(),
-    title: title || '',
-    company: company || '',
-    location: location || '',
+    title: metadata.title,
+    company: metadata.company,
+    location: metadata.location,
     work_mode: lower.includes('remote') ? 'remote' : lower.includes('hybrid') ? 'hybrid' : lower.includes('onsite') ? 'onsite' : '',
     skills,
     description: normalized,
@@ -83,11 +237,11 @@ export function extractJobFromFile({ input, output } = {}) {
   return { facts, output: out };
 }
 
-export async function extractJobFromUrl({ url, output } = {}) {
+export async function extractJobFromUrl({ url, output, fetchImpl = fetch } = {}) {
   if (!url) throw new Error('Job URL is required.');
   let response;
   try {
-    response = await fetch(url);
+    response = await fetchImpl(url);
   } catch (err) {
     throw new Error(`Could not fetch job URL: ${url}. ${err.message}`);
   }
@@ -96,11 +250,12 @@ export async function extractJobFromUrl({ url, output } = {}) {
   }
   const contentType = response.headers.get('content-type') || '';
   const raw = await response.text();
+  const hints = contentType.includes('html') || /<html|<body|<main|<article/i.test(raw) ? extractHtmlHints(raw) : {};
   const text = contentType.includes('html') || /<html|<body|<main|<article/i.test(raw)
     ? htmlToText(raw)
     : raw.trim();
   if (!text) throw new Error(`No job description text extracted from URL: ${url}`);
-  const facts = extractJobFacts(text, url);
+  const facts = extractJobFacts(text, url, hints);
   const out = output || outputPathForFacts(facts, 'url-job');
   mkdirSync(dirname(resolve(out)), { recursive: true });
   writeFileSync(out, JSON.stringify(facts, null, 2) + '\n');

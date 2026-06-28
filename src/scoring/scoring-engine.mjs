@@ -1,7 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { pathToFileURL } from 'url';
-import { extractJobFromUrl } from '../jobs/extract-job.mjs';
+import { extractJobFromUrl, inferJobMetadataFromText } from '../jobs/extract-job.mjs';
+import { uniqueKeyForApplication } from '../applications/application-records.mjs';
 
 async function readYaml(path) {
   const raw = readFileSync(path, 'utf-8');
@@ -56,10 +57,17 @@ function readJobMetadata(jobPath, jobText) {
   if (jobPath?.endsWith('.json')) {
     try {
       const parsed = JSON.parse(jobText);
+      const inferred = inferJobMetadataFromText(parsed.description || jobText, {
+        title: parsed.title,
+        company: parsed.company,
+        location: parsed.location,
+      });
       return {
-        company: parsed.company || '',
-        role: parsed.title || '',
+        company: parsed.company || inferred.company || '',
+        role: parsed.title || inferred.title || '',
+        location: parsed.location || inferred.location || '',
         source: parsed.source || jobPath,
+        description: parsed.description || '',
       };
     } catch {
       // Fall back to text matching below.
@@ -70,7 +78,9 @@ function readJobMetadata(jobPath, jobText) {
     || '';
   const company = jobText.match(/^Company:\s*(.+)$/im)?.[1]?.trim()
     || '';
-  return { company, role, source: jobPath };
+  const location = jobText.match(/^Location:\s*(.+)$/im)?.[1]?.trim()
+    || '';
+  return { company, role, location, source: jobPath, description: jobText };
 }
 
 function readJobTextForScoring(jobPath) {
@@ -183,20 +193,39 @@ export function writeApplicationScore({ jobPath, jobText, result, outputDir = 'd
   outputDir = process.env.APPLICATION_ASSISTANT_APPLICATIONS_DIR || outputDir;
   const meta = readJobMetadata(jobPath, jobText);
   const today = new Date().toISOString().slice(0, 10);
-  const output = `${outputDir}/${today}-${slugify(meta.company)}-${slugify(meta.role)}.json`;
+  const uniqueKey = uniqueKeyForApplication(meta);
+  const output = `${outputDir}/${today}-${uniqueKey}.json`;
   const record = {
     schema_version: 1,
+    id: uniqueKey,
+    unique_key: uniqueKey,
     created_at: new Date().toISOString(),
+    discovered_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    last_scored_at: new Date().toISOString(),
     company: meta.company,
     role: meta.role,
+    role_title: meta.role,
+    location: meta.location || '',
+    country: '',
+    language: '',
     source: meta.source,
+    job_url: meta.source,
+    canonical_url: meta.source,
     status: 'scored_needs_human_review',
     human_approval_required_before_applying: true,
     score: result.overall_score,
     recommendation: result.recommendation,
     risks: result.risks,
     missing_skills: result.missing_skills,
+    top_reasons: result.top_reasons,
     generated_files: {},
+    cv_pdf_path: '',
+    cover_letter_pdf_path: '',
+    job_description_path: '',
+    scoring_path: '',
+    duplicate_of: '',
+    notes: '',
   };
   mkdirSync(dirname(resolve(output)), { recursive: true });
   writeFileSync(output, JSON.stringify(record, null, 2) + '\n');

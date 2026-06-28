@@ -5,11 +5,19 @@
   "private": true,
   "scripts": {
     "doctor": "node doctor.mjs",
+    "app": "node src/dashboard/server.mjs",
+    "app:no-discover": "node src/dashboard/server.mjs --no-discover",
+    "refresh": "node src/applications/refresh-once.mjs",
     "cv:ingest": "node src/cv/master-cv.mjs",
     "score:job": "node src/scoring/scoring-engine.mjs",
     "generate:cv": "node src/cv/generate-tailored-cv.mjs",
     "generate:cover-letter": "node src/cover_letters/generate-cover-letter.mjs",
     "interview:prep": "node src/interview/generate-interview-prep.mjs",
+    "discover:jobs": "node src/jobs/discover-jobs.mjs",
+    "score:batch": "node src/scoring/score-batch.mjs",
+    "generate:batch": "node src/applications/generate-batch.mjs",
+    "apply:queue": "node src/applications/apply-queue.mjs",
+    "apply:assist": "node src/applications/apply-assist.mjs",
     "test:application-assistant": "node test-application-assistant.mjs"
   },
   "keywords": [
