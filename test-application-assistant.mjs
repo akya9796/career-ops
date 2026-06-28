@@ -25,6 +25,7 @@ import { parseAiConfig } from './src/ai/ai-config.mjs';
 import { AIManager } from './src/ai/ai-manager.mjs';
 import { loadPrompt } from './src/ai/prompt-loader.mjs';
 import { GeminiProvider } from './src/ai/providers/gemini.mjs';
+import { testGeminiSetup } from './src/ai/test-gemini.mjs';
 
 const temp = mkdtempSync(join(tmpdir(), 'application-assistant-'));
 
@@ -113,6 +114,7 @@ We need API analysis, REST, JSON, XML, Jira, functional specifications, and stak
   assert.match(readFileSync('.env.local.example', 'utf-8'), /JOBUP_USERNAME=\nJOBUP_PASSWORD=/);
   assert.match(readFileSync('.env.local.example', 'utf-8'), /^GEMINI_API_KEY=$/m);
   assert.equal(JSON.parse(readFileSync('package.json', 'utf-8')).scripts['login:portal'], 'node src/jobs/login-portal.mjs');
+  assert.equal(JSON.parse(readFileSync('package.json', 'utf-8')).scripts['ai:test'], 'node src/ai/test-gemini.mjs');
   assert.equal(parseAiConfig(readFileSync('config/ai.yml', 'utf-8')).provider, 'gemini');
   assert.equal(loadPrompt('cover-letter').text.includes('Use only facts from `cv.md`'), true);
 
@@ -156,6 +158,21 @@ We need API analysis, REST, JSON, XML, Jira, functional specifications, and stak
   assert.equal(attempts, 2);
   assert.equal(fallbackResult.ok, false);
   assert.equal(fallbackResult.text, 'safe fallback');
+
+  const aiTestEnvPath = join(temp, 'ai-test.env.local');
+  writeFileSync(aiTestEnvPath, 'GEMINI_API_KEY=test-key\n');
+  const aiTestResult = await testGeminiSetup({
+    envPath: aiTestEnvPath,
+    env: {},
+    fetchImpl: async (url, options) => {
+      assert.equal(String(url).includes('test-key'), false);
+      assert.equal(options.headers['x-goog-api-key'], 'test-key');
+      assert.equal(String(options.body).includes('test-key'), false);
+      return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: 'OK' }] } }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+    },
+  });
+  assert.equal(aiTestResult.ok, true);
+  assert.equal(aiTestResult.checks.some(check => check.message.includes('Gemini API connection works')), true);
 
   const securePortals = join(temp, 'secure-portals.yml');
   writeFileSync(securePortals, `discovery:

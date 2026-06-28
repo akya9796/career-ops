@@ -19,6 +19,7 @@
     "generate:batch": "node src/applications/generate-batch.mjs",
     "apply:queue": "node src/applications/apply-queue.mjs",
     "apply:assist": "node src/applications/apply-assist.mjs",
+    "ai:test": "node src/ai/test-gemini.mjs",
     "test:application-assistant": "node test-application-assistant.mjs"
   },
   "keywords": [

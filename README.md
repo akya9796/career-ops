@@ -111,6 +111,14 @@ Switching providers later should only require changing `provider:` and that prov
 
 If Gemini is missing or fails, the app retries once, writes deterministic fallback content where needed, and keeps the dashboard usable.
 
+Verify the setup without printing your key:
+
+```bash
+npm run ai:test
+```
+
+The check confirms `config/ai.yml` exists, the selected provider is `gemini`, `GEMINI_API_KEY` is available from `.env.local` or the process environment, and a small Gemini API request succeeds.
+
 ## Start The App
 
 ```bash
@@ -290,6 +298,7 @@ npm run score:batch
 npm run generate:batch
 npm run apply:queue
 npm run apply:assist -- --latest
+npm run ai:test
 npm run score:job -- --url https://company.example/jobs/123
 npm run generate:cover-letter -- --latest --pdf
 npm run generate:cover-letter -- --latest --ai --pdf

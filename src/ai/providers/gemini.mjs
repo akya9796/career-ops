@@ -3,6 +3,11 @@ import { buildPromptInput } from '../prompt-loader.mjs';
 
 function extractInteractionText(json) {
   if (typeof json?.output_text === 'string') return json.output_text;
+  const candidateText = json?.candidates?.[0]?.content?.parts
+    ?.map(part => part.text || '')
+    .join('')
+    .trim();
+  if (candidateText) return candidateText;
   const parts = [];
   for (const step of json?.steps || []) {
     for (const item of step?.content || []) {
@@ -25,7 +30,9 @@ export class GeminiProvider {
     const apiKey = this.env[envName];
     if (!apiKey) throw new MissingAIKeyError(this.id, envName);
     const model = request.model || this.config.model || 'gemini-2.5-flash';
-    const endpoint = this.config.endpoint || 'https://generativelanguage.googleapis.com/v1beta/interactions';
+    const modelPath = String(model).startsWith('models/') ? String(model) : `models/${model}`;
+    const endpoint = this.config.endpoint || `https://generativelanguage.googleapis.com/v1beta/${modelPath}:generateContent`;
+    const prompt = buildPromptInput(request);
     const response = await this.fetchImpl(endpoint, {
       method: 'POST',
       headers: {
@@ -33,10 +40,11 @@ export class GeminiProvider {
         'x-goog-api-key': apiKey,
       },
       body: JSON.stringify({
-        model,
-        input: buildPromptInput(request),
-        temperature: request.temperature ?? 0.35,
-        max_output_tokens: request.maxOutputTokens ?? 2048,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: request.temperature ?? 0.35,
+          maxOutputTokens: request.maxOutputTokens ?? 2048,
+        },
         store: false,
       }),
       signal: AbortSignal.timeout(request.timeoutMs || 45_000),
