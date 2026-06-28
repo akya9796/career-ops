@@ -1,0 +1,6 @@
+Job Title: Technical Business Analyst
+Company: ExampleCo
+Location: France / Hybrid
+
+Example job description for local testing. The role involves API analysis, REST and SOAP services, JSON and XML payload validation, Jira, Confluence, functional specifications, stakeholder coordination, QA collaboration, and E2E testing.
+

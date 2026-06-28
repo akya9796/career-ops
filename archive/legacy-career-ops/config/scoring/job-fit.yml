@@ -1,0 +1,187 @@
+version: 1
+scale:
+  min: 0
+  max: 100
+
+recommendations:
+  strong_apply: 82
+  apply: 68
+  maybe: 52
+
+dimensions:
+  skill_overlap:
+    weight: 12
+    positive_keywords:
+      - product definition
+      - business analysis
+      - rest api
+      - soap api
+      - xml
+      - json
+      - excel vba
+      - functional design
+      - technical documentation
+      - agile
+      - safe
+      - jira
+      - requirements
+      - sql
+      - python
+      - power bi
+  product_fit:
+    weight: 10
+    positive_keywords:
+      - product manager
+      - product owner
+      - roadmap
+      - discovery
+      - requirements
+      - stakeholders
+      - prd
+      - product strategy
+  business_analysis_fit:
+    weight: 8
+    positive_keywords:
+      - business analyst
+      - requirements engineering
+      - process mapping
+      - functional specification
+      - stakeholder management
+  api_technical_fit:
+    weight: 9
+    positive_keywords:
+      - api
+      - integration
+      - rest
+      - soap
+      - xml
+      - json
+      - service catalog
+      - mapping
+  domain_overlap:
+    weight: 7
+    positive_keywords:
+      - hospitality
+      - travel
+      - saas
+      - enterprise software
+      - supply chain
+      - b2b platform
+  career_progression:
+    weight: 7
+    positive_keywords:
+      - senior
+      - lead
+      - owner
+      - strategy
+      - platform
+      - architecture
+  salary_potential:
+    weight: 5
+    positive_keywords:
+      - switzerland
+      - zurich
+      - geneva
+      - lausanne
+      - salary
+      - compensation
+  swiss_permit_friendliness:
+    weight: 8
+    positive_keywords:
+      - switzerland
+      - geneva
+      - lausanne
+      - zurich
+      - hybrid
+      - cross-border
+      - frontalier
+      - permit g
+    risk_keywords:
+      - swiss citizenship required
+      - eu citizen required
+      - already authorized
+  english_language_friendliness:
+    weight: 6
+    positive_keywords:
+      - english
+      - international
+      - global
+    risk_keywords:
+      - native french
+      - native german
+      - fluent german required
+      - fluent french required
+  hybrid_remote_friendliness:
+    weight: 5
+    positive_keywords:
+      - remote
+      - hybrid
+      - flexible
+      - europe remote
+      - remote europe
+    risk_keywords:
+      - onsite
+      - relocation required
+  company_quality:
+    weight: 5
+    positive_keywords:
+      - scale-up
+      - high growth
+      - global
+      - platform
+      - product-led
+  learning_opportunity:
+    weight: 4
+    positive_keywords:
+      - learning
+      - mentorship
+      - complex systems
+      - transformation
+  ai_exposure:
+    weight: 4
+    positive_keywords:
+      - ai
+      - machine learning
+      - genai
+      - llm
+      - automation
+  technical_growth:
+    weight: 4
+    positive_keywords:
+      - architecture
+      - systems
+      - platform
+      - data
+      - integrations
+  product_ownership:
+    weight: 3
+    positive_keywords:
+      - ownership
+      - backlog
+      - roadmap
+      - prioritization
+  leadership_opportunity:
+    weight: 2
+    positive_keywords:
+      - lead
+      - mentor
+      - cross-functional
+      - influence
+  future_market_demand:
+    weight: 1
+    positive_keywords:
+      - ai
+      - api
+      - platform
+      - data
+      - product
+
+risk_level:
+  risk_keywords:
+    - unpaid
+    - commission only
+    - native speaker only
+    - must already have swiss work authorization
+    - no sponsorship
+    - relocation required
+

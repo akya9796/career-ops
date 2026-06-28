@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "scale": { "min": 0, "max": 100 },
+  "recommendations": {
+    "apply": 72,
+    "maybe": 55
+  },
+  "dimensions": {
+    "skill_overlap": {
+      "weight": 25,
+      "positive_keywords": [
+        "api analysis",
+        "rest",
+        "soap",
+        "json",
+        "xml",
+        "etl",
+        "vba",
+        "bulk data ingestion",
+        "postman",
+        "bruno",
+        "swagger",
+        "jira",
+        "confluence",
+        "github",
+        "bitbucket",
+        "python"
+      ]
+    },
+    "product_analysis_fit": {
+      "weight": 20,
+      "positive_keywords": [
+        "product definition",
+        "product analyst",
+        "product owner",
+        "product manager",
+        "functional analysis",
+        "requirements",
+        "backlog",
+        "stakeholder"
+      ]
+    },
+    "business_analysis_fit": {
+      "weight": 18,
+      "positive_keywords": [
+        "business analyst",
+        "gap analysis",
+        "functional specs",
+        "technical specs",
+        "process documentation",
+        "user guides",
+        "cross-team collaboration"
+      ]
+    },
+    "domain_overlap": {
+      "weight": 12,
+      "positive_keywords": [
+        "hospitality",
+        "hospitality-tech",
+        "fintech",
+        "ecommerce",
+        "supply chain",
+        "transport",
+        "logistics",
+        "data-intensive"
+      ]
+    },
+    "delivery_fit": {
+      "weight": 10,
+      "positive_keywords": [
+        "agile",
+        "safe",
+        "e2e testing",
+        "qa",
+        "engineering",
+        "milestone",
+        "risk",
+        "kpi"
+      ]
+    },
+    "seniority_fit": {
+      "weight": 8,
+      "positive_keywords": [
+        "senior",
+        "lead",
+        "owner",
+        "mentor",
+        "liaison",
+        "cross-functional"
+      ]
+    },
+    "risk_level": {
+      "weight": 7,
+      "positive_keywords": [
+        "english",
+        "hybrid",
+        "remote",
+        "france",
+        "europe"
+      ],
+      "risk_keywords": [
+        "native german",
+        "native french",
+        "swiss citizenship required",
+        "eu citizenship required",
+        "already authorized",
+        "relocation required"
+      ]
+    }
+  },
+  "risk_level": {
+    "risk_keywords": [
+      "commission only",
+      "unpaid",
+      "native german",
+      "native french",
+      "swiss citizenship required",
+      "eu citizenship required",
+      "already authorized",
+      "relocation required"
+    ]
+  }
+}
+

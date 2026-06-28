@@ -1,0 +1,87 @@
+candidate:
+  full_name: Akash Kotkar
+  location: France, near the Swiss border / Geneva region
+  nationality: Indian
+  current_role: Product Definition Analyst at Amadeus through Astek
+  work_authorization_note: Currently in France. For Swiss roles, evaluate Permit G / border-worker possibility where relevant, but do not claim Swiss work authorization unless explicitly configured.
+
+target:
+  direction: Move toward Switzerland or strong English-speaking European opportunities.
+  countries:
+    - Switzerland
+    - France
+    - Remote Europe
+  role_families:
+    - Product Manager
+    - Technical Product Manager
+    - Product Definition Analyst
+    - Senior Business Analyst
+    - Technical Business Analyst
+    - Solution Analyst
+    - API Product Owner
+    - Product Owner
+    - Functional Architect
+    - Systems Analyst
+    - Business Systems Analyst
+    - AI Product Manager
+    - Platform Product Manager
+    - Integration Consultant
+    - Supply Chain Product / Tech roles
+  industries:
+    - Travel Tech
+    - Hospitality Tech
+    - SaaS
+    - Enterprise Software
+    - AI
+    - FinTech
+    - Supply Chain Tech
+    - B2B Platforms
+    - Data / API platforms
+  companies:
+    - Amadeus
+    - Booking.com
+    - Expedia
+    - Microsoft
+    - Google
+    - Amazon
+    - Datadog
+    - Snowflake
+    - NVIDIA
+    - OpenAI
+    - Anthropic
+    - Stripe
+    - Adyen
+    - Swiss product companies
+    - Geneva/Lausanne/Zurich companies
+    - scale-ups
+    - high-growth startups
+
+known_experience_from_user_prompt:
+  current:
+    - Product Definition
+    - Business Analysis
+    - REST APIs
+    - SOAP APIs
+    - XML
+    - JSON
+    - Excel VBA
+    - Functional Design
+    - Technical Documentation
+    - Agile / SAFe
+    - Hospitality technology
+    - Product ownership support
+    - Requirements engineering
+    - API analysis
+    - Service catalog / mapping
+    - Jira / delivery ceremonies
+  previous:
+    - Supply Chain
+    - Technical Project Management
+    - ERP / WMS
+    - Analytics
+    - Python
+    - SQL
+    - Power BI
+    - Process optimization
+    - Cross-functional coordination
+

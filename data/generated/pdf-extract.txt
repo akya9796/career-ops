@@ -1,0 +1,58 @@
+MSc MANAGEMENT & OPTIMIZATION OF SUPPLY CHAIN, TRANSPORT       
+IMT Atlantique Nantes, France
+BACHELORS OF MECHANICAL ENGINEERING
+S.P.P.U.-Pune Université, Pune, INDIA
+Dec 2020 – Apr 2022
+• Developed inventory optimization models across 21 warehouses, improving stock allocation efficiency
+• Built a box-packing optimization algorithm that increased full-truckload utilization by 14%
+• Automated key logistics workflows in Python, reducing late deliveries by 10%
+MACHINE LEARNING INTERN at IMT Atlantique
+• Built ML-based decision support tool to reduce inventory holding costs under lead-time uncertainty.
+kotkarakash46@gmail.com
+Annecy, France LinkedIn: kotkar-akash
++33745671942
+BUSINESS ANALYST at Finwizard Technology  
+Technical Product Analyst with 5+ years of experience working on complex, data-intensive platforms across hospitality-tech, fintech, and ecommerce. 
+Specialized in API-driven workflows, bulk data ingestion systems, and functional system analysis, with a strong track record of improving data reliability, 
+issue resolution speed, and product usability at scale. 
+Oct 2022 – Mar 2024TECHNICAL PROJECT MANAGER at IMT Atlantique
+• Managed multi-stakeholder technical projects, aligning deliverables with EU/academic requirements and ensuring on-time execution through KPI, 
+risk, and milestone tracking
+• Coordinated cross-functional collaboration across technical, administrative, and research teams to keep project delivery smooth and structured
+• Optimized KYC workflows through client segmentation, reducing documentation requirements.
+• Built reconciliation logic for BSE/NSE datasets and implemented data cleansing protocols.
+• Conducted API testing for client classification and data extraction.
+Bulk data ingestion designs , API Integration , Cross-system data consistency , RCA on production issues
+API analysis (REST / SOAP) , JSON / XML payload validation , ETL workflow validation , VBA macros , Data transformation
+KOTKAR Akash
+SUMMARY
+CORE SKILLS
+TECHNICAL
+DATA/INTEGRATION
+WORK EXPERIENCE
+BUSINESS ANALYST at Firstcry.com 
+EDUCATION
+May 2022 – Sep 2022 
+Apr 2020 – Sep 2020
+Sep 2018 - Dec 2020
+Jun 2013 - July 2017
+KOTKAR Akash
+METHODS Agile (SAFe) , Backlog Prioritization , Cross-Team Collaboration , E2E Testing , Gap Analysis
+Postman , Bruno , Swagger , Jira , Confluence , GitHub , Bitbucket , python automationTOOLS
+Functional Specs , Technical Specs , User Guides , Process DocumentationDOCUEMENTATION
+Aug 2024 – Present PRODUCT DEFINITION ANALYST at Amadeus (Astek)
+• Led functional evolution of the platform’s bulk data ingestion workflow (Excel → CSV → API)
+• Enabled scalable handling of complex hotel pricing structures with thousands of rate/price plans
+• Supported high-volume onboarding via multi-sheet CSV uploads generating thousands of API calls
+• Acted as the key liaison between product, engineering, and QA to triage functional/data/technical issues
+• Designed API workarounds and improved Excel template logic to ensure smooth customer operations
+• Aligned stakeholders on system constraints to drive realistic, scalable onboarding solutions
+• Mentored developers and QA while strengthening E2E testing with detailed scenarios and edge-case coverage
+• Specialist in understanding, scaling, and stabilizing complex data workflows in large systems 
+• Focus: API-driven platforms, Bulk data ingestion , Functional system analysis
+POSITIONING
+KEY IMPACTS
+• Reduced root cause identification time from ~2 days to 2–3 hours for production issues
+• Supported data operations for 6,000+ hotels with highly complex pricing structures through high-volume bulk updates (thousands of API calls per 
+upload) via structured data workflows
+• Improved logistics efficiency by +14% (FTL utilization) through optimization algorithms

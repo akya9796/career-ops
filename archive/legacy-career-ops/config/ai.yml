@@ -1,0 +1,28 @@
+default_provider: ollama
+
+providers:
+  openai:
+    enabled: false
+    model: gpt-4.1
+    api_key_env: OPENAI_API_KEY
+  claude:
+    enabled: false
+    model: claude-sonnet-4
+    api_key_env: ANTHROPIC_API_KEY
+  gemini:
+    enabled: false
+    model: gemini-2.5-flash
+    api_key_env: GEMINI_API_KEY
+  ollama:
+    enabled: true
+    base_url: http://localhost:11434
+    model: llama3.3
+
+output_requirements:
+  include_source_references: true
+  include_confidence_level: true
+  include_hallucination_risk_check: true
+  include_facts_used_from_cv: true
+  include_facts_inferred_from_job_description: true
+  include_facts_not_allowed_to_claim: true
+

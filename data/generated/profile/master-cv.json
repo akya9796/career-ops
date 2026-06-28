@@ -1,0 +1,742 @@
+{
+  "schema_version": 1,
+  "source": {
+    "path": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+    "ingested_at": "2026-06-28T00:18:45.960Z",
+    "format": "md",
+    "extraction": {
+      "status": "ok",
+      "method": "plain-text"
+    }
+  },
+  "sections": [
+    {
+      "title": "Akash Kotkar",
+      "type": "akash_kotkar",
+      "line_start": 1,
+      "line_end": 7
+    },
+    {
+      "title": "Summary",
+      "type": "summary",
+      "line_start": 8,
+      "line_end": 11
+    },
+    {
+      "title": "Core Skills",
+      "type": "skills",
+      "line_start": 12,
+      "line_end": 13
+    },
+    {
+      "title": "Technical",
+      "type": "skills",
+      "line_start": 14,
+      "line_end": 20
+    },
+    {
+      "title": "Data and Integration",
+      "type": "skills",
+      "line_start": 21,
+      "line_end": 28
+    },
+    {
+      "title": "Methods",
+      "type": "skills",
+      "line_start": 29,
+      "line_end": 36
+    },
+    {
+      "title": "Tools",
+      "type": "skills",
+      "line_start": 37,
+      "line_end": 47
+    },
+    {
+      "title": "Documentation",
+      "type": "skills",
+      "line_start": 48,
+      "line_end": 54
+    },
+    {
+      "title": "Work Experience",
+      "type": "experience",
+      "line_start": 55,
+      "line_end": 56
+    },
+    {
+      "title": "Product Definition Analyst at Amadeus (Astek)",
+      "type": "product_definition_analyst_at_amadeus_astek",
+      "line_start": 57,
+      "line_end": 68
+    },
+    {
+      "title": "Business Analyst at Finwizard Technology",
+      "type": "skills",
+      "line_start": 69,
+      "line_end": 76
+    },
+    {
+      "title": "Business Analyst at Firstcry.com",
+      "type": "business_analyst_at_firstcry_com",
+      "line_start": 77,
+      "line_end": 80
+    },
+    {
+      "title": "Technical Project Manager at IMT Atlantique",
+      "type": "skills",
+      "line_start": 81,
+      "line_end": 87
+    },
+    {
+      "title": "Machine Learning Intern at IMT Atlantique",
+      "type": "machine_learning_intern_at_imt_atlantique",
+      "line_start": 88,
+      "line_end": 93
+    },
+    {
+      "title": "Education",
+      "type": "education",
+      "line_start": 94,
+      "line_end": 95
+    },
+    {
+      "title": "MSc Management & Optimization of Supply Chain, Transport",
+      "type": "msc_management_optimization_of_supply_chain_transport",
+      "line_start": 96,
+      "line_end": 100
+    },
+    {
+      "title": "Bachelors of Mechanical Engineering",
+      "type": "bachelors_of_mechanical_engineering",
+      "line_start": 101,
+      "line_end": 105
+    },
+    {
+      "title": "Key Impacts",
+      "type": "key_impacts",
+      "line_start": 106,
+      "line_end": 114
+    },
+    {
+      "title": "Positioning",
+      "type": "positioning",
+      "line_start": 115,
+      "line_end": 120
+    }
+  ],
+  "facts": [
+    {
+      "id": "cv:1",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Akash Kotkar",
+      "section_type": "akash_kotkar",
+      "line_start": 1,
+      "line_end": 7,
+      "text": "Annecy, France  \nEmail: kotkarakash46@gmail.com  \nPhone: +33745671942  \nLinkedIn: kotkar-akash"
+    },
+    {
+      "id": "cv:2",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Summary",
+      "section_type": "summary",
+      "line_start": 8,
+      "line_end": 11,
+      "text": "Technical Product Analyst with 5+ years of experience working on complex, data-intensive platforms across hospitality-tech, fintech, and ecommerce. Specialized in API-driven workflows, bulk data ingestion systems, and functional system analysis, with a strong track record of improving data reliability, issue resolution speed, and product usability at scale."
+    },
+    {
+      "id": "cv:3",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Technical",
+      "section_type": "skills",
+      "line_start": 14,
+      "line_end": 20,
+      "text": "- Bulk data ingestion designs\n- API integration\n- Cross-system data consistency\n- RCA on production issues"
+    },
+    {
+      "id": "cv:4",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Technical",
+      "section_type": "skills_bullet",
+      "line_start": 16,
+      "line_end": 16,
+      "text": "Bulk data ingestion designs"
+    },
+    {
+      "id": "cv:5",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Technical",
+      "section_type": "skills_bullet",
+      "line_start": 17,
+      "line_end": 17,
+      "text": "API integration"
+    },
+    {
+      "id": "cv:6",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Technical",
+      "section_type": "skills_bullet",
+      "line_start": 18,
+      "line_end": 18,
+      "text": "Cross-system data consistency"
+    },
+    {
+      "id": "cv:7",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Technical",
+      "section_type": "skills_bullet",
+      "line_start": 19,
+      "line_end": 19,
+      "text": "RCA on production issues"
+    },
+    {
+      "id": "cv:8",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Data and Integration",
+      "section_type": "skills",
+      "line_start": 21,
+      "line_end": 28,
+      "text": "- API analysis (REST / SOAP)\n- JSON / XML payload validation\n- ETL workflow validation\n- VBA macros\n- Data transformation"
+    },
+    {
+      "id": "cv:9",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Data and Integration",
+      "section_type": "skills_bullet",
+      "line_start": 23,
+      "line_end": 23,
+      "text": "API analysis (REST / SOAP)"
+    },
+    {
+      "id": "cv:10",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Data and Integration",
+      "section_type": "skills_bullet",
+      "line_start": 24,
+      "line_end": 24,
+      "text": "JSON / XML payload validation"
+    },
+    {
+      "id": "cv:11",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Data and Integration",
+      "section_type": "skills_bullet",
+      "line_start": 25,
+      "line_end": 25,
+      "text": "ETL workflow validation"
+    },
+    {
+      "id": "cv:12",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Data and Integration",
+      "section_type": "skills_bullet",
+      "line_start": 26,
+      "line_end": 26,
+      "text": "VBA macros"
+    },
+    {
+      "id": "cv:13",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Data and Integration",
+      "section_type": "skills_bullet",
+      "line_start": 27,
+      "line_end": 27,
+      "text": "Data transformation"
+    },
+    {
+      "id": "cv:14",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Methods",
+      "section_type": "skills",
+      "line_start": 29,
+      "line_end": 36,
+      "text": "- Agile (SAFe)\n- Backlog prioritization\n- Cross-team collaboration\n- E2E testing\n- Gap analysis"
+    },
+    {
+      "id": "cv:15",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Methods",
+      "section_type": "skills_bullet",
+      "line_start": 31,
+      "line_end": 31,
+      "text": "Agile (SAFe)"
+    },
+    {
+      "id": "cv:16",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Methods",
+      "section_type": "skills_bullet",
+      "line_start": 32,
+      "line_end": 32,
+      "text": "Backlog prioritization"
+    },
+    {
+      "id": "cv:17",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Methods",
+      "section_type": "skills_bullet",
+      "line_start": 33,
+      "line_end": 33,
+      "text": "Cross-team collaboration"
+    },
+    {
+      "id": "cv:18",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Methods",
+      "section_type": "skills_bullet",
+      "line_start": 34,
+      "line_end": 34,
+      "text": "E2E testing"
+    },
+    {
+      "id": "cv:19",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Methods",
+      "section_type": "skills_bullet",
+      "line_start": 35,
+      "line_end": 35,
+      "text": "Gap analysis"
+    },
+    {
+      "id": "cv:20",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Tools",
+      "section_type": "skills",
+      "line_start": 37,
+      "line_end": 47,
+      "text": "- Postman\n- Bruno\n- Swagger\n- Jira\n- Confluence\n- GitHub\n- Bitbucket\n- Python automation"
+    },
+    {
+      "id": "cv:21",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Tools",
+      "section_type": "skills_bullet",
+      "line_start": 39,
+      "line_end": 39,
+      "text": "Postman"
+    },
+    {
+      "id": "cv:22",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Tools",
+      "section_type": "skills_bullet",
+      "line_start": 40,
+      "line_end": 40,
+      "text": "Bruno"
+    },
+    {
+      "id": "cv:23",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Tools",
+      "section_type": "skills_bullet",
+      "line_start": 41,
+      "line_end": 41,
+      "text": "Swagger"
+    },
+    {
+      "id": "cv:24",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Tools",
+      "section_type": "skills_bullet",
+      "line_start": 42,
+      "line_end": 42,
+      "text": "Jira"
+    },
+    {
+      "id": "cv:25",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Tools",
+      "section_type": "skills_bullet",
+      "line_start": 43,
+      "line_end": 43,
+      "text": "Confluence"
+    },
+    {
+      "id": "cv:26",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Tools",
+      "section_type": "skills_bullet",
+      "line_start": 44,
+      "line_end": 44,
+      "text": "GitHub"
+    },
+    {
+      "id": "cv:27",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Tools",
+      "section_type": "skills_bullet",
+      "line_start": 45,
+      "line_end": 45,
+      "text": "Bitbucket"
+    },
+    {
+      "id": "cv:28",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Tools",
+      "section_type": "skills_bullet",
+      "line_start": 46,
+      "line_end": 46,
+      "text": "Python automation"
+    },
+    {
+      "id": "cv:29",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Documentation",
+      "section_type": "skills",
+      "line_start": 48,
+      "line_end": 54,
+      "text": "- Functional specs\n- Technical specs\n- User guides\n- Process documentation"
+    },
+    {
+      "id": "cv:30",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Documentation",
+      "section_type": "skills_bullet",
+      "line_start": 50,
+      "line_end": 50,
+      "text": "Functional specs"
+    },
+    {
+      "id": "cv:31",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Documentation",
+      "section_type": "skills_bullet",
+      "line_start": 51,
+      "line_end": 51,
+      "text": "Technical specs"
+    },
+    {
+      "id": "cv:32",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Documentation",
+      "section_type": "skills_bullet",
+      "line_start": 52,
+      "line_end": 52,
+      "text": "User guides"
+    },
+    {
+      "id": "cv:33",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Documentation",
+      "section_type": "skills_bullet",
+      "line_start": 53,
+      "line_end": 53,
+      "text": "Process documentation"
+    },
+    {
+      "id": "cv:34",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Product Definition Analyst at Amadeus (Astek)",
+      "section_type": "product_definition_analyst_at_amadeus_astek",
+      "line_start": 57,
+      "line_end": 68,
+      "text": "Aug 2024 - Present\n\n- Led functional evolution of the platform's bulk data ingestion workflow (Excel -> CSV -> API).\n- Enabled scalable handling of complex hotel pricing structures with thousands of rate/price plans.\n- Supported high-volume onboarding via multi-sheet CSV uploads generating thousands of API calls.\n- Acted as the key liaison between product, engineering, and QA to triage functional/data/technical issues.\n- Designed API workarounds and improved Excel template logic to ensure smooth customer operations.\n- Aligned stakeholders on system constraints to drive realistic, scalable onboarding solutions.\n- Mentored developers and QA while strengthening E2E testing with detailed scenarios and edge-case coverage."
+    },
+    {
+      "id": "cv:35",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Product Definition Analyst at Amadeus (Astek)",
+      "section_type": "product_definition_analyst_at_amadeus_astek_bullet",
+      "line_start": 61,
+      "line_end": 61,
+      "text": "Led functional evolution of the platform's bulk data ingestion workflow (Excel -> CSV -> API)."
+    },
+    {
+      "id": "cv:36",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Product Definition Analyst at Amadeus (Astek)",
+      "section_type": "product_definition_analyst_at_amadeus_astek_bullet",
+      "line_start": 62,
+      "line_end": 62,
+      "text": "Enabled scalable handling of complex hotel pricing structures with thousands of rate/price plans."
+    },
+    {
+      "id": "cv:37",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Product Definition Analyst at Amadeus (Astek)",
+      "section_type": "product_definition_analyst_at_amadeus_astek_bullet",
+      "line_start": 63,
+      "line_end": 63,
+      "text": "Supported high-volume onboarding via multi-sheet CSV uploads generating thousands of API calls."
+    },
+    {
+      "id": "cv:38",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Product Definition Analyst at Amadeus (Astek)",
+      "section_type": "product_definition_analyst_at_amadeus_astek_bullet",
+      "line_start": 64,
+      "line_end": 64,
+      "text": "Acted as the key liaison between product, engineering, and QA to triage functional/data/technical issues."
+    },
+    {
+      "id": "cv:39",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Product Definition Analyst at Amadeus (Astek)",
+      "section_type": "product_definition_analyst_at_amadeus_astek_bullet",
+      "line_start": 65,
+      "line_end": 65,
+      "text": "Designed API workarounds and improved Excel template logic to ensure smooth customer operations."
+    },
+    {
+      "id": "cv:40",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Product Definition Analyst at Amadeus (Astek)",
+      "section_type": "product_definition_analyst_at_amadeus_astek_bullet",
+      "line_start": 66,
+      "line_end": 66,
+      "text": "Aligned stakeholders on system constraints to drive realistic, scalable onboarding solutions."
+    },
+    {
+      "id": "cv:41",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Product Definition Analyst at Amadeus (Astek)",
+      "section_type": "product_definition_analyst_at_amadeus_astek_bullet",
+      "line_start": 67,
+      "line_end": 67,
+      "text": "Mentored developers and QA while strengthening E2E testing with detailed scenarios and edge-case coverage."
+    },
+    {
+      "id": "cv:42",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Business Analyst at Finwizard Technology",
+      "section_type": "skills",
+      "line_start": 69,
+      "line_end": 76,
+      "text": "Oct 2022 - Mar 2024\n\n- Optimized KYC workflows through client segmentation, reducing documentation requirements.\n- Built reconciliation logic for BSE/NSE datasets and implemented data cleansing protocols.\n- Conducted API testing for client classification and data extraction."
+    },
+    {
+      "id": "cv:43",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Business Analyst at Finwizard Technology",
+      "section_type": "skills_bullet",
+      "line_start": 73,
+      "line_end": 73,
+      "text": "Optimized KYC workflows through client segmentation, reducing documentation requirements."
+    },
+    {
+      "id": "cv:44",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Business Analyst at Finwizard Technology",
+      "section_type": "skills_bullet",
+      "line_start": 74,
+      "line_end": 74,
+      "text": "Built reconciliation logic for BSE/NSE datasets and implemented data cleansing protocols."
+    },
+    {
+      "id": "cv:45",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Business Analyst at Finwizard Technology",
+      "section_type": "skills_bullet",
+      "line_start": 75,
+      "line_end": 75,
+      "text": "Conducted API testing for client classification and data extraction."
+    },
+    {
+      "id": "cv:46",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Business Analyst at Firstcry.com",
+      "section_type": "business_analyst_at_firstcry_com",
+      "line_start": 77,
+      "line_end": 80,
+      "text": "May 2022 - Sep 2022"
+    },
+    {
+      "id": "cv:47",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Technical Project Manager at IMT Atlantique",
+      "section_type": "skills",
+      "line_start": 81,
+      "line_end": 87,
+      "text": "Dec 2020 - Apr 2022\n\n- Managed multi-stakeholder technical projects, aligning deliverables with EU/academic requirements and ensuring on-time execution through KPI, risk, and milestone tracking.\n- Coordinated cross-functional collaboration across technical, administrative, and research teams to keep project delivery smooth and structured."
+    },
+    {
+      "id": "cv:48",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Technical Project Manager at IMT Atlantique",
+      "section_type": "skills_bullet",
+      "line_start": 85,
+      "line_end": 85,
+      "text": "Managed multi-stakeholder technical projects, aligning deliverables with EU/academic requirements and ensuring on-time execution through KPI, risk, and milestone tracking."
+    },
+    {
+      "id": "cv:49",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Technical Project Manager at IMT Atlantique",
+      "section_type": "skills_bullet",
+      "line_start": 86,
+      "line_end": 86,
+      "text": "Coordinated cross-functional collaboration across technical, administrative, and research teams to keep project delivery smooth and structured."
+    },
+    {
+      "id": "cv:50",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Machine Learning Intern at IMT Atlantique",
+      "section_type": "machine_learning_intern_at_imt_atlantique",
+      "line_start": 88,
+      "line_end": 93,
+      "text": "Apr 2020 - Sep 2020\n\n- Built ML-based decision support tool to reduce inventory holding costs under lead-time uncertainty."
+    },
+    {
+      "id": "cv:51",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Machine Learning Intern at IMT Atlantique",
+      "section_type": "machine_learning_intern_at_imt_atlantique_bullet",
+      "line_start": 92,
+      "line_end": 92,
+      "text": "Built ML-based decision support tool to reduce inventory holding costs under lead-time uncertainty."
+    },
+    {
+      "id": "cv:52",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "MSc Management & Optimization of Supply Chain, Transport",
+      "section_type": "msc_management_optimization_of_supply_chain_transport",
+      "line_start": 96,
+      "line_end": 100,
+      "text": "IMT Atlantique, Nantes, France  \nSep 2018 - Dec 2020"
+    },
+    {
+      "id": "cv:53",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Bachelors of Mechanical Engineering",
+      "section_type": "bachelors_of_mechanical_engineering",
+      "line_start": 101,
+      "line_end": 105,
+      "text": "S.P.P.U.-Pune Universite, Pune, India  \nJun 2013 - July 2017"
+    },
+    {
+      "id": "cv:54",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Key Impacts",
+      "section_type": "key_impacts",
+      "line_start": 106,
+      "line_end": 114,
+      "text": "- Reduced root cause identification time from approximately 2 days to 2-3 hours for production issues.\n- Supported data operations for 6,000+ hotels with highly complex pricing structures through high-volume bulk updates (thousands of API calls per upload) via structured data workflows.\n- Improved logistics efficiency by 14% FTL utilization through optimization algorithms.\n- Developed inventory optimization models across 21 warehouses, improving stock allocation efficiency.\n- Built a box-packing optimization algorithm that increased full-truckload utilization by 14%.\n- Automated key logistics workflows in Python, reducing late deliveries by 10%."
+    },
+    {
+      "id": "cv:55",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Key Impacts",
+      "section_type": "key_impacts_bullet",
+      "line_start": 108,
+      "line_end": 108,
+      "text": "Reduced root cause identification time from approximately 2 days to 2-3 hours for production issues."
+    },
+    {
+      "id": "cv:56",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Key Impacts",
+      "section_type": "key_impacts_bullet",
+      "line_start": 109,
+      "line_end": 109,
+      "text": "Supported data operations for 6,000+ hotels with highly complex pricing structures through high-volume bulk updates (thousands of API calls per upload) via structured data workflows."
+    },
+    {
+      "id": "cv:57",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Key Impacts",
+      "section_type": "key_impacts_bullet",
+      "line_start": 110,
+      "line_end": 110,
+      "text": "Improved logistics efficiency by 14% FTL utilization through optimization algorithms."
+    },
+    {
+      "id": "cv:58",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Key Impacts",
+      "section_type": "key_impacts_bullet",
+      "line_start": 111,
+      "line_end": 111,
+      "text": "Developed inventory optimization models across 21 warehouses, improving stock allocation efficiency."
+    },
+    {
+      "id": "cv:59",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Key Impacts",
+      "section_type": "key_impacts_bullet",
+      "line_start": 112,
+      "line_end": 112,
+      "text": "Built a box-packing optimization algorithm that increased full-truckload utilization by 14%."
+    },
+    {
+      "id": "cv:60",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Key Impacts",
+      "section_type": "key_impacts_bullet",
+      "line_start": 113,
+      "line_end": 113,
+      "text": "Automated key logistics workflows in Python, reducing late deliveries by 10%."
+    },
+    {
+      "id": "cv:61",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Positioning",
+      "section_type": "positioning",
+      "line_start": 115,
+      "line_end": 120,
+      "text": "- Specialist in understanding, scaling, and stabilizing complex data workflows in large systems.\n- Focus: API-driven platforms, bulk data ingestion, functional system analysis."
+    },
+    {
+      "id": "cv:62",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Positioning",
+      "section_type": "positioning_bullet",
+      "line_start": 117,
+      "line_end": 117,
+      "text": "Specialist in understanding, scaling, and stabilizing complex data workflows in large systems."
+    },
+    {
+      "id": "cv:63",
+      "source": "D:\\Projects\\Repositories\\career-ops\\cv.md",
+      "section": "Positioning",
+      "section_type": "positioning_bullet",
+      "line_start": 118,
+      "line_end": 118,
+      "text": "Focus: API-driven platforms, bulk data ingestion, functional system analysis."
+    }
+  ],
+  "skills": [
+    "administrative",
+    "Agile",
+    "aligning deliverables with EU",
+    "and milestone tracking.",
+    "API analysis",
+    "API integration",
+    "Backlog prioritization",
+    "Bitbucket",
+    "Bruno",
+    "Built reconciliation logic for BSE",
+    "Bulk data ingestion designs",
+    "Confluence",
+    "Cross-system data consistency",
+    "Cross-team collaboration",
+    "Data transformation",
+    "Dec 2020 - Apr 2022",
+    "E2E testing",
+    "ETL workflow validation",
+    "Functional specs",
+    "Gap analysis",
+    "GitHub",
+    "Jira",
+    "JSON",
+    "Oct 2022 - Mar 2024",
+    "Postman",
+    "Process documentation",
+    "Python automation",
+    "RCA on production issues",
+    "reducing documentation requirements.",
+    "REST",
+    "risk",
+    "SAFe",
+    "SOAP",
+    "Swagger",
+    "Technical specs",
+    "User guides",
+    "VBA macros",
+    "XML payload validation"
+  ],
+  "safety": {
+    "source_of_truth": "master_cv",
+    "original_cv_preserved": true,
+    "generation_rule": "Generated content may use these facts only when paired with profile config and approved knowledge files."
+  }
+}
